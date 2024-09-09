@@ -27,7 +27,7 @@ function Signup() {
 		setLoading(true);
 		try {
 			const res = await axios.post(
-				"/api/users/register",
+				"https://capstone-backend-1-fu98.onrender.com/api/users/register",
 				{ username, email, password, confirmPassword },
 				{ withCredentials: true }
 			);
