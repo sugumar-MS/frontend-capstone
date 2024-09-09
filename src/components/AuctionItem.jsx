@@ -1,3 +1,4 @@
+// components/AuctionItem.jsx
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useParams, Link, useNavigate } from "react-router-dom";
@@ -25,7 +26,7 @@ function AuctionItem() {
 	useEffect(() => {
 		const fetchAuctionItem = async () => {
 			try {
-				const res = await axios.get(`https://capstone-backend-1-fu98.onrender.com/api/auctions/${id}`);
+				const res = await axios.get(`/api/auctions/${id}`);
 				setAuctionItem(res.data);
 			} catch (error) {
 				console.error("Error fetching auction item:", error);
@@ -40,7 +41,7 @@ function AuctionItem() {
 			if (token) {
 				try {
 					const res = await axios.post(
-						"https://capstone-backend-1-fu98.onrender.com/api/users/profile",
+						"/api/users/profile",
 						{},
 						{
 							headers: { Authorization: `Bearer ${token}` },
@@ -53,20 +54,24 @@ function AuctionItem() {
 			}
 		};
 
-		const fetchWinner = async () => {
-            try {
-              const res = await axios.get(`https://capstone-backend-1-fu98.onrender.com/api/auctions/winner/${id}`);
-              setWinner(res.data.winner);
-            } catch (error) {
-              if (error.response && error.response.data) {
-                console.error("Error fetching auction winner:", error.response.data.message || error.message);
-              } else {
-                console.error("Error fetching auction winner:", error.message);
-              }
+        const fetchWinner = async () => {
+            const token = document.cookie
+                .split("; ")
+                .find((row) => row.startsWith("jwt="))
+                ?.split("=")[1];
+        
+            if (token) {
+                try {
+                    const res = await axios.get(`/api/auctions/winner/${id}`, {
+                        headers: { Authorization: `Bearer ${token}` },
+                    });
+                    setWinner(res.data.winner);
+                } catch (error) {
+                    console.error("Error fetching auction winner:", error.response?.data || error);
+                }
             }
-          };
-          
-
+        };
+        
 		fetchAuctionItem();
 		fetchUser();
 		fetchWinner();
@@ -74,22 +79,29 @@ function AuctionItem() {
 
 	useEffect(() => {
 		const fetchBids = async () => {
-			setLoadingBids(true);
-			try {
-				const res = await axios.get(`https://capstone-backend-1-fu98.onrender.com/api/bids/${id}`);
-				const sortedBids = res.data.sort(
-					(a, b) => b.bidAmount - a.bidAmount
-				);
-				setBids(sortedBids);
-				setTotalPages(
-					Math.ceil(sortedBids.length / ITEMS_PER_PAGE) || 0
-				);
-			} catch (error) {
-				console.error("Error fetching bids:", error);
-			} finally {
-				setLoadingBids(false);
-			}
-		};
+            setLoadingBids(true);
+            const token = document.cookie
+                .split("; ")
+                .find((row) => row.startsWith("jwt="))
+                ?.split("=")[1];
+        
+            if (token) {
+                try {
+                    const res = await axios.get(`/api/bids/${id}`, {
+                        headers: { Authorization: `Bearer ${token}` },
+                    });
+                    const sortedBids = res.data.sort(
+                        (a, b) => b.bidAmount - a.bidAmount
+                    );
+                    setBids(sortedBids);
+                    setTotalPages(Math.ceil(sortedBids.length / ITEMS_PER_PAGE) || 0);
+                } catch (error) {
+                    console.error("Error fetching bids:", error.response?.data || error);
+                } finally {
+                    setLoadingBids(false);
+                }
+            }
+        };
 
 		fetchBids();
 	}, [id]);
@@ -125,7 +137,7 @@ function AuctionItem() {
 
 	const handleDelete = async () => {
 		try {
-			await axios.delete(`https://capstone-backend-1-fu98.onrender.com/api/auctions/${id}`);
+			await axios.delete(`/api/auctions/${id}`);
 			navigate("/auctions");
 		} catch (error) {
 			console.error("Error deleting auction item:", error);

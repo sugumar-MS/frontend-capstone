@@ -1,3 +1,4 @@
+// components/Login.jsx
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate, Link } from "react-router-dom";
@@ -24,7 +25,7 @@ function Login() {
 		setLoading(true);
 		try {
 			const res = await axios.post(
-				"https://capstone-backend-1-fu98.onrender.com/api/users/login",
+				"/api/users/login",
 				{ email, password },
 				{ withCredentials: true }
 			);

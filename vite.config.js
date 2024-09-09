@@ -1,7 +1,7 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 
-const target = "https://capstone-backend-1-fu98.onrender.com/api";
+const target = "http://localhost:5000/api";
 
 export default defineConfig({
 	plugins: [react()],
